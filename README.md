@@ -1,2 +1,7 @@
 # NearSpaceBalloon
-Flight Computer code for near-space balloon project
+Code for near-space balloon project
+
+Directory Listing:
+
+- `chdk/` Camera scripts
+- `comp/` Flight computer code
