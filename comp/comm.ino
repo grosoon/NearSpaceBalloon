@@ -7,6 +7,7 @@
  */
 
 #define RADIOPIN 9
+#define BITRATE 1000 / 50; // 50 baud
 
 void setup() {
 	pinMode(RADIOPIN, OUTPUT);
@@ -84,15 +85,60 @@ void setPWMFrequency(int pin, int divisor) {
 	}
 }
 
-byte[] hadamard(byte msg) {
-	byte[] enc = new byte[7];
+void send(int data) {
+	// isolate 16 bit int into 4-bit numbers
+	byte a = data;
+	byte b = data >> 4;
+	byte c = data >> 8;
+	byte d = data >> 12;
 
-	for (byte ct = 0; i < 64; i++) {
-		byte i = ct + 64;
+	// hadamard encode
+	byte[] a_enc = hadamard_enc(a);
+	byte[] b_enc = hadamard_enc(b);
+	byte[] c_enc = hadamard_enc(c);
+	byte[] d_enc = hadamard_enc(d);
+
+	// send
+	sendByte(a_enc[0]);
+	sendByte(a_enc[1]);
+	sendByte(b_enc[0]);
+	sendByte(b_enc[1]);
+	sendByte(c_enc[0]);
+	sendByte(c_enc[1]);
+	sendByte(d_enc[0]);
+	sendByte(d_enc[1]);
+}
+
+void sendByte(byte d) {
+	// send each bit
+	analogWrite(RADIOPIN, 100 + 10*(d & 1)); 
+	delay(BITRATE);
+	analogWrite(RADIOPIN, 100 + 10*(d & 2)); 
+	delay(BITRATE);
+	analogWrite(RADIOPIN, 100 + 10*(d & 4)); 
+	delay(BITRATE);
+	analogWrite(RADIOPIN, 100 + 10*(d & 8)); 
+	delay(BITRATE);
+	analogWrite(RADIOPIN, 100 + 10*(d & 16)); 
+	delay(BITRATE);
+	analogWrite(RADIOPIN, 100 + 10*(d & 32)); 
+	delay(BITRATE);
+	analogWrite(RADIOPIN, 100 + 10*(d & 64)); 
+	delay(BITRATE);
+	analogWrite(RADIOPIN, 100 + 10*(d & 128)); 
+	delay(BITRATE);
+}
+
+byte[] hadamard_enc(byte msg) {
+	byte[] enc = new byte[2];
+
+	msg &= 15; // mask upper bits
+
+	for (byte ct = 0; ct < 16; ct++) {
+		byte i = ct + 16;
 		// multiply corresponding bits
 		byte a = i & msg;
 		// sum (mod 2)
-		a ^= a >> 8;
 		a ^= a >> 4;
 		a ^= a >> 2;
 		a ^= a >> 1;
@@ -102,4 +148,22 @@ byte[] hadamard(byte msg) {
 	}
 
 	return enc;
+}
+
+byte hadamard_dec(byte[] msg) {
+	byte x = 0;
+	
+	for (byte i = 0; i < 4; i++) {
+		byte j = random(16);
+		byte k;
+		for (k = 0; k < 16; k++) {
+			if ((j ^ k) == 1 << i) break;
+		}
+		byte c = (msg[j/8] >> (j%8)) & 1;
+		byte d = (msg[k/8] >> (k%8)) & 1;
+
+		x += (c ^ d) << i;
+	}
+
+	return x;
 }
