@@ -12,7 +12,7 @@ const r_earth = 6.371e6;
 const G = 6.674e-11;
 
 // drag constants
-var C_D = 0.3 // sphere coeff. of drag
+const C_D = 0.3 // sphere coeff. of drag
 
 // balloon characteristics
 const m_empty = 0.8;
