@@ -1,4 +1,4 @@
-# NearSpaceBalloon
+# GSEA Near-Space Balloon Project
 Code for near-space balloon project
 
 Directory Listing:
