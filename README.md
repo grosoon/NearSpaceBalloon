@@ -1,5 +1,5 @@
 # GSEA Near-Space Balloon Project
-Code for near-space balloon project
+Code for near-space balloon project.
 
 Directory Listing:
 
