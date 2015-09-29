@@ -7,7 +7,9 @@
  */
 
 #define RADIOPIN 9
-#define BITRATE 1000 / 50; // 50 baud
+#define BITRATE (1000 / 50) // n baud
+#define BASE 0
+#define RANGE 255
 
 void setup() {
 	pinMode(RADIOPIN, OUTPUT);
@@ -16,9 +18,9 @@ void setup() {
 
 void loop() {
 	// alternate between high and low frequency @ 2Hz.
-	analogWrite(RADIOPIN, 100);
+	analogWrite(RADIOPIN, BASE);
 	delay(500);
-	analogWrite(RADIOPIN, 110);
+	analogWrite(RADIOPIN, BASE + RANGE);
 	delay(500);
 }
 
@@ -93,10 +95,10 @@ void send(int data) {
 	byte d = data >> 12;
 
 	// hadamard encode
-	byte[] a_enc = hadamard_enc(a);
-	byte[] b_enc = hadamard_enc(b);
-	byte[] c_enc = hadamard_enc(c);
-	byte[] d_enc = hadamard_enc(d);
+	byte* a_enc = hadamard_enc(a);
+	byte* b_enc = hadamard_enc(b);
+	byte* c_enc = hadamard_enc(c);
+	byte* d_enc = hadamard_enc(d);
 
 	// send
 	sendByte(a_enc[0]);
@@ -111,26 +113,26 @@ void send(int data) {
 
 void sendByte(byte d) {
 	// send each bit
-	analogWrite(RADIOPIN, 100 + 10*(d & 1)); 
+	analogWrite(RADIOPIN, BASE + RANGE*(d & 1)); 
 	delay(BITRATE);
-	analogWrite(RADIOPIN, 100 + 10*(d & 2)); 
+	analogWrite(RADIOPIN, BASE + RANGE*(d & 2)); 
 	delay(BITRATE);
-	analogWrite(RADIOPIN, 100 + 10*(d & 4)); 
+	analogWrite(RADIOPIN, BASE + RANGE*(d & 4)); 
 	delay(BITRATE);
-	analogWrite(RADIOPIN, 100 + 10*(d & 8)); 
+	analogWrite(RADIOPIN, BASE + RANGE*(d & 8)); 
 	delay(BITRATE);
-	analogWrite(RADIOPIN, 100 + 10*(d & 16)); 
+	analogWrite(RADIOPIN, BASE + RANGE*(d & 16)); 
 	delay(BITRATE);
-	analogWrite(RADIOPIN, 100 + 10*(d & 32)); 
+	analogWrite(RADIOPIN, BASE + RANGE*(d & 32)); 
 	delay(BITRATE);
-	analogWrite(RADIOPIN, 100 + 10*(d & 64)); 
+	analogWrite(RADIOPIN, BASE + RANGE*(d & 64)); 
 	delay(BITRATE);
-	analogWrite(RADIOPIN, 100 + 10*(d & 128)); 
+	analogWrite(RADIOPIN, BASE + RANGE*(d & 128)); 
 	delay(BITRATE);
 }
 
-byte[] hadamard_enc(byte msg) {
-	byte[] enc = new byte[2];
+byte* hadamard_enc(byte msg) {
+	byte* enc = new byte[2];
 
 	msg &= 15; // mask upper bits
 
@@ -150,7 +152,7 @@ byte[] hadamard_enc(byte msg) {
 	return enc;
 }
 
-byte hadamard_dec(byte[] msg) {
+byte hadamard_dec(byte msg[]) {
 	byte x = 0;
 	
 	for (byte i = 0; i < 4; i++) {
