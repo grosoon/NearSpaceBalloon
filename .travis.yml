@@ -7,6 +7,7 @@ before_install:
   - tar xf arduino-1.6.5-linux64.tar.xz
   - sudo mv arduino-1.6.5 /usr/local/share/arduino
   - sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino
+  - export LANG=en_US.UTF-8
 install:
 script:
   - arduino --verify --board arduino:avr:uno $PWD/comp/src/main.ino
