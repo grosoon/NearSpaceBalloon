@@ -1,9 +1,10 @@
 /*
- COMMUNICATION CODE
-
- GSEA NEAR SPACE BALLOON
-
- SEPTEMBER 2015.  ALL RIGHTS RESERVED.
+ * NEAR SPACE BALLOON PROJECT
+ * COMMUNICATION CODE
+ *
+ * GRINNELL SPACE EXPLORATION AGENCY
+ *
+ * (c) 2015.  All Rights Reserved.
  */
 
 #define RADIOPIN 9
@@ -11,17 +12,9 @@
 #define BASE 0
 #define RANGE 255
 
-void setup() {
+void setupComms() {
 	pinMode(RADIOPIN, OUTPUT);
 	setPWMFrequency(RADIOPIN, 1);
-}
-
-void loop() {
-	// alternate between high and low frequency @ 2Hz.
-	analogWrite(RADIOPIN, BASE);
-	delay(500);
-	analogWrite(RADIOPIN, BASE + RANGE);
-	delay(500);
 }
 
 /*
