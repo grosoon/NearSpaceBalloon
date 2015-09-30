@@ -1,2 +1,4 @@
 .build/
+a.out
+.tmp
 .DS_STORE
