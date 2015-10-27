@@ -7,11 +7,11 @@
  * (c) 2015.  All Rights Reserved.
  */
 
-#define RADIOPIN 9
-#define BITRATE (1000 / 50) // n baud
-#define BASE 0
-#define RANGE 255
+#include "comm.h"
 
+/*
+ * Setup pin and PWM data
+ */
 void setupComms() {
 	pinMode(RADIOPIN, OUTPUT);
 	setPWMFrequency(RADIOPIN, 1);
@@ -80,19 +80,27 @@ void setPWMFrequency(int pin, int divisor) {
 	}
 }
 
+/*
+ * Send a 16-bit int via the radio
+ */
 void send(int data) {
 	// isolate 16 bit int into 4-bit numbers
 	byte a = data;
 	byte b = data >> 4;
 	byte c = data >> 8;
 	byte d = data >> 12;
-
+	
 	// hadamard encode
-	byte* a_enc = hadamard_enc(a);
-	byte* b_enc = hadamard_enc(b);
-	byte* c_enc = hadamard_enc(c);
-	byte* d_enc = hadamard_enc(d);
+	byte a_enc[2] = {0, 0}; 
+	byte b_enc[2] = {0, 0}; 
+	byte c_enc[2] = {0, 0}; 
+	byte d_enc[2] = {0, 0}; 
 
+	hadamard_enc(a, a_enc);
+	hadamard_enc(b, b_enc);
+	hadamard_enc(c, c_enc);
+	hadamard_enc(d, d_enc);
+	
 	// send
 	sendByte(a_enc[0]);
 	sendByte(a_enc[1]);
@@ -104,6 +112,9 @@ void send(int data) {
 	sendByte(d_enc[1]);
 }
 
+/*
+ * Send a single raw byte via the radio
+ */
 void sendByte(byte d) {
 	// send each bit
 	analogWrite(RADIOPIN, BASE + RANGE*(d & 1)); 
@@ -124,9 +135,10 @@ void sendByte(byte d) {
 	delay(BITRATE);
 }
 
-byte* hadamard_enc(byte msg) {
-	byte* enc = new byte[2];
-
+/*
+ * Encode a byte into a 4-block Hadamard code
+ */
+void hadamard_enc(byte msg, byte enc[]) {
 	msg &= 15; // mask upper bits
 
 	for (byte ct = 0; ct < 16; ct++) {
@@ -141,10 +153,11 @@ byte* hadamard_enc(byte msg) {
 		// store in enc array
 		enc[ct / 8] += a << (7 - ct % 8);
 	}
-
-	return enc;
 }
 
+/*
+ * Decode a 4-block hadamard code into a single byte
+ */
 byte hadamard_dec(byte msg[]) {
 	byte x = 0;
 	
