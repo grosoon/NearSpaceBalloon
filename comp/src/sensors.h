@@ -6,6 +6,9 @@
  *
  * (c) 2015.  All Rights Reserved.
  */
+#include <Wire.h>
+
+#define tmp102Address 0x48
 
 double getLatitude();
 double getLongitude();
