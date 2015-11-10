@@ -8,7 +8,11 @@
  */
 
  #include "sensors.h"
-
+ 
+ SFE_BMP180 pressure;
+ int baseline;
+ 
+ 
 /*
  * Return current probe latitude, in degrees above the equator.
  */
@@ -96,4 +100,25 @@ double getPressure()
     else Serial.println("error retrieving temperature measurement\n");
   }
   else Serial.println("error starting temperature measurement\n");
+}
+void sensorSetup()
+{
+if (pressure.begin())
+    Serial.println("BMP180 init success");
+  else
+  {
+    // Oops, something went wrong, this is usually a connection problem,
+    // see the comments at the top of this sketch for the proper connections.
+
+    Serial.println("BMP180 init fail (disconnected?)\n\n");
+    while(1); // Pause forever.
+  }
+
+  // Get the baseline pressure:
+
+  baseline = getPressure();
+
+  Serial.print("baseline pressure: ");
+  Serial.print(baseline);
+  Serial.println(" mb");  
 }
