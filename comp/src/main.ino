@@ -13,6 +13,7 @@
 // runs once at start
 void setup() {
 	setupComms();
+	Wire.begin();
 }
 
 // runs continuously
