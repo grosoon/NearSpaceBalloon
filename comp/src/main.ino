@@ -13,6 +13,7 @@
 // runs once at start
 void setup() {
 	setupComms();
+	sensorSetup();
 }
 
 // runs continuously
