@@ -34,7 +34,16 @@ double getAltitude() {
  * Return current air temperature, in Kelvin
  */
 double getTemperature() {
-	return 0.0; // TODO Implement
+  Wire.requestFrom(tmp102Address,2); 
+
+  byte MSB = Wire.read();
+  byte LSB = Wire.read();
+
+  //it's a 12bit int, using two's compliment for negative
+  int temperatureSum = ((MSB << 8) | LSB) >> 4; 
+
+  double celsius = temperatureSum*0.0625;
+  return celsius;
 }
 
 /* 
